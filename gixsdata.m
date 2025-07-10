@@ -1627,7 +1627,10 @@ elseif strcmpi(obj.ImFileExt,'.fits')
     info = fitsinfo(obj.ImFile);
 elseif strcmpi(obj.ImFileExt,'.h5') || strcmpi(obj.ImFileExt,'.hdf')
     info = h5info(obj.ImFile);
-    im = h5read(obj.ImFile, '/entry/data/data');
+    im = transpose(h5read(obj.ImFile, '/entry/data/data'));
+    % rawData = h5read(obj.ImFile, '/entry/data/data');
+    % assert(size(rawData, 1) == 1, 'Error: The first dimension of hdf file is not 1.');
+    % im = transpose(squeeze(rawData));
 else
     error('Invalid image type.');
 end

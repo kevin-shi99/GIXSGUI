@@ -169,7 +169,7 @@ uicontrol('Parent',hFigGapFill,...
     'style','Text',...
     'Units','pixel',...
     'backgroundcolor',backgroundcolor,...
-    'String','Base Image - Load base image (upper position) (TIF/TIFF or CBF format only). ',...
+    'String','Base Image - Load base image (upper position) (TIF/TIFF, CBF or HDF format). ',...
     'HorizontalAlignment','left',...
     'Position',[5,figSize(2)-250,figSize(1)-10,15]);
 uicontrol('Parent',hFigGapFill,...
@@ -360,7 +360,7 @@ function loaddlg(~,~,hEdit,dlgname,ii,file)
 %udata = get(hFigGapFill,'UserData');
 % oldpath = pwd;
 % if ~isempty(udata.path), cd(udata.path); end
-[filename,pathname] = uigetfile({'*.tif;*.tiff;';'*.cbf'},dlgname,file);
+[filename,pathname] = uigetfile({'*.tif;*.tiff;*.cbf;*.hdf;*.h5','All Supported Files';'*.tif;*.tiff','TIF/TIFF Files';'*.cbf','CBF Files';'*.hdf;*.h5','HDF Files'},dlgname,file);
 % cd(oldpath); 
 if isequal(filename,0), return; end
 f = fullfile(pathname,filename);
@@ -384,7 +384,7 @@ if exist(f,'file')==0,
     return;
 end
 [pathstr, ~, ext] = fileparts(f);
-if strcmpi(ext,'.tif') || ~strcmpi(ext,'.tiff')
+if strcmpi(ext,'.tif') || strcmpi(ext,'.tiff')
     path = pathstr;
     file = f;    
     data = double(imread(f));    
@@ -393,6 +393,11 @@ elseif strcmpi(ext,'.cbf')
     file = f;    
     tmp = cbfread(f);
     data = double(tmp.data');    
+elseif strcmpi(ext,'.hdf') || strcmpi(ext,'.h5')
+    path = pathstr;
+    file = f;
+    info = h5info(f);
+    data = double(transpose(h5read(f, '/entry/data/data')));
 else
     errordlg('Invalid file format.','File Format Error','modal');
     set(hEdit,'string',oldfile);
