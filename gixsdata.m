@@ -1616,7 +1616,7 @@ elseif strcmpi(obj.ImFileExt,'.mat')
     info = [];
 elseif strcmpi(obj.ImFileExt,'.cbf')
     tmp = cbfread(obj.ImFile);
-    im = single(tmp.data');
+    im = single(tmp.data);
     info = tmp.header;
 elseif strcmpi(obj.ImFileExt,'.edf')
     %[tmp, info] = edfreader(obj.ImFile);
@@ -1625,6 +1625,9 @@ elseif strcmpi(obj.ImFileExt,'.edf')
 elseif strcmpi(obj.ImFileExt,'.fits')
     im = fitsread(obj.ImFile,'image');
     info = fitsinfo(obj.ImFile);
+elseif strcmpi(obj.ImFileExt,'.h5') || strcmpi(obj.ImFileExt,'.hdf')
+    info = h5info(obj.ImFile);
+    im = single(h5read(obj.ImFile, '/entry/data/data'));
 else
     error('Invalid image type.');
 end

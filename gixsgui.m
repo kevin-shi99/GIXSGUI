@@ -1257,7 +1257,9 @@ a = [dir(fullfile(udata.path,'*.tif'));
     dir(fullfile(udata.path,'*.cbf'));
     dir(fullfile(udata.path,'*.fits'));
     dir(fullfile(udata.path,'*.edf'));
-    dir(fullfile(udata.path,'*.imm'))];
+    dir(fullfile(udata.path,'*.imm'));
+    dir(fullfile(udata.path,'*.h5'));
+    dir(fullfile(udata.path,'*.hdf'))];
 if isempty(a)
     flist = {};
 else
@@ -1627,7 +1629,7 @@ hFigGIXS = gcbf;
 udata = get(hFigGIXS,'UserData');
 oldpath = pwd;
 if ~isempty(udata.path), cd(udata.path); end
-[filename,pathname] = uigetfile({'*.mat','MAT-files (*.mat)';'*.par','gisaxsviewer parameter files for MAR165 (*.par)';'*.*','All files (*.*)'},'Load Parameter File');
+[filename,pathname] = uigetfile({'*.mat','MAT-files (*.mat)';'*.par','gisaxsviewer parameter files for MAR165 (*.par)';'*.json','JSON files (*.json)';'*.*','All files (*.*)'},'Load Parameter File');
 cd(oldpath);
 if isequal(filename,0), return; end
 f = fullfile(pathname, filename);
@@ -1645,6 +1647,33 @@ elseif strcmpi(ext,'.mat')
     tmp = fieldnames(p); p = p.(tmp{1});
     if ~strcmpi(class(p),'gixsdata'),return; end
     udata.paramsDefault = copyhobj(p);
+elseif strcmpi(ext,'.json')
+    try
+        json_str = fileread(f);
+        params = jsondecode(json_str);
+        udata.paramsDefault = gixsdata;
+        if isfield(params, 'energy')
+            udata.paramsDefault.XEnergy = params.energy;
+        end
+        if isfield(params, 'SDD')
+            udata.paramsDefault.SDD = params.SDD;
+        end
+        if isfield(params, 'pixel_size')
+            udata.paramsDefault.PixelSize = [params.pixel_size, params.pixel_size];
+        end
+        if isfield(params, 'beam0')
+            udata.paramsDefault.Beam0 = params.beam0(:)';  % Ensure row vector
+        end
+        if isfield(params, 'specular')
+            udata.paramsDefault.Specular = params.specular;
+        end
+        if isfield(params, 'incident')
+            udata.paramsDefault.IncidentAngle = params.incident;
+        end
+    catch ME
+        errordlg(['Error reading JSON file: ' ME.message], 'JSON Error');
+        return;
+    end
 else
     return;
 end
@@ -1786,9 +1815,13 @@ try
         udata.gdata = [udata.gdata;gdata];
     end
     if exist('hwarndlg','var'), delete(hwarndlg); end
-catch
+catch ME
     if exist('hwarndlg','var'), delete(hwarndlg); end
-    %error('Loading file failed.');
+    fprintf(2, 'An error occurred while loading the image:\n');
+    fprintf(2, '%s\n', ME.message);
+    disp('Error stack trace:');
+    disp(ME.stack);
+    errordlg(['Error loading file: ' ME.message], 'Loading Error');
     return;
 end
 delete(gdata0);
