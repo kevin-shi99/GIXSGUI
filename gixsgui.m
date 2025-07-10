@@ -1662,10 +1662,10 @@ elseif strcmpi(ext,'.json')
             udata.paramsDefault.PixelSize = [params.pixel_size, params.pixel_size];
         end
         if isfield(params, 'beam0')
-            udata.paramsDefault.Beam0 = params.beam0(:)';  % Ensure row vector
+            udata.paramsDefault.Beam0 = params.beam0(:);  % Ensure row vector
         end
         if isfield(params, 'specular')
-            udata.paramsDefault.Specular = params.specular;
+            udata.paramsDefault.Specular = params.specular(:); % Ensure row vector
         end
         if isfield(params, 'incident')
             udata.paramsDefault.IncidentAngle = params.incident;
