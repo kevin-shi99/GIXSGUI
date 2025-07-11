@@ -1627,10 +1627,12 @@ elseif strcmpi(obj.ImFileExt,'.fits')
     info = fitsinfo(obj.ImFile);
 elseif strcmpi(obj.ImFileExt,'.h5') || strcmpi(obj.ImFileExt,'.hdf')
     info = h5info(obj.ImFile);
-    im = transpose(h5read(obj.ImFile, '/entry/data/data'));
-    % rawData = h5read(obj.ImFile, '/entry/data/data');
-    % assert(size(rawData, 1) == 1, 'Error: The first dimension of hdf file is not 1.');
-    % im = transpose(squeeze(rawData));
+    % Sum along the 3rd dimension (which corresponds to n_frames).
+    % If n_frames is 1, raw_data will be a 2D array, and sum(..., 3)
+    % will correctly return the array itself without error.
+    raw_data = h5read(obj.ImFile, '/entry/data/data');
+    summed_along_frames = sum(raw_data, 3);
+    im = transpose(summed_along_frames);
 else
     error('Invalid image type.');
 end

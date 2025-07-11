@@ -397,7 +397,9 @@ elseif strcmpi(ext,'.hdf') || strcmpi(ext,'.h5')
     path = pathstr;
     file = f;
     info = h5info(f);
-    data = double(transpose(h5read(f, '/entry/data/data')));
+    raw_data = h5read(f, '/entry/data/data');
+    summed_along_frames = sum(raw_data, 3);
+    data = double(transpose(summed_along_frames));
 else
     errordlg('Invalid file format.','File Format Error','modal');
     set(hEdit,'string',oldfile);
