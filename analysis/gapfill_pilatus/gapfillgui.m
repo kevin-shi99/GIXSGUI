@@ -394,12 +394,22 @@ elseif strcmpi(ext,'.cbf')
     tmp = cbfread(f);
     data = double(tmp.data');    
 elseif strcmpi(ext,'.hdf') || strcmpi(ext,'.h5')
-    path = pathstr;
-    file = f;
-    info = h5info(f);
-    raw_data = h5read(f, '/entry/data/data');
-    summed_along_frames = sum(raw_data, 3);
-    data = double(transpose(summed_along_frames));
+    try
+        info = h5info(f);
+        raw_data = h5read(f, '/entry/data/data');
+        summed_along_frames = sum(raw_data, 3);
+        data = double(transpose(summed_along_frames));
+        path = pathstr;
+        file = f;
+    catch ME
+        msg = hdf5filtermsg(f, '/entry/data/data', ME);
+        errordlg(msg, 'HDF5 Read Error', 'modal');
+        set(hEdit,'string',oldfile);
+        file = oldfile;
+        path = oldpath;
+        data = olddata;
+        return;
+    end
 else
     errordlg('Invalid file format.','File Format Error','modal');
     set(hEdit,'string',oldfile);

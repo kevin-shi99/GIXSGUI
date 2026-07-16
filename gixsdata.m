@@ -1626,13 +1626,18 @@ elseif strcmpi(obj.ImFileExt,'.fits')
     im = fitsread(obj.ImFile,'image');
     info = fitsinfo(obj.ImFile);
 elseif strcmpi(obj.ImFileExt,'.h5') || strcmpi(obj.ImFileExt,'.hdf')
-    info = h5info(obj.ImFile);
-    % Sum along the 3rd dimension (which corresponds to n_frames).
-    % If n_frames is 1, raw_data will be a 2D array, and sum(..., 3)
-    % will correctly return the array itself without error.
-    raw_data = h5read(obj.ImFile, '/entry/data/data');
-    summed_along_frames = sum(raw_data, 3);
-    im = transpose(summed_along_frames);
+    try
+        info = h5info(obj.ImFile);
+        % Sum along the 3rd dimension (which corresponds to n_frames).
+        % If n_frames is 1, raw_data will be a 2D array, and sum(..., 3)
+        % will correctly return the array itself without error.
+        raw_data = h5read(obj.ImFile, '/entry/data/data');
+        summed_along_frames = sum(raw_data, 3);
+        im = transpose(summed_along_frames);
+    catch ME
+        msg = hdf5filtermsg(obj.ImFile, '/entry/data/data', ME);
+        error('gixsdata:hdf5ReadFailed', '%s', msg);
+    end
 else
     error('Invalid image type.');
 end

@@ -31,6 +31,10 @@ background.
   `gixsdata.m` correction methods (solid angle, efficiency, polarization). It is not called from
   any MATLAB code — treat MATLAB as the source of truth and update this file manually if the
   MATLAB corrections change.
+- [hdf5_recompress_gui.py](hdf5_recompress_gui.py) is another standalone, non-integrated Python
+  tool (same convention as `correction_functions.py`): a Tkinter GUI that re-encodes HDF5 files
+  using non-native compression filters (e.g. lz4) to gzip, so they can be loaded by MATLAB's HDF5
+  loaders below.
 - `demos/` holds runnable example scripts paired with saved `.mat` parameter sets. They hardcode
   the original author's network paths (e.g. `N:\2014-2\...`) — treat as templates to adapt, not
   as scripts to run unmodified.
@@ -59,6 +63,7 @@ Toolbox (linecut export).
 
 ## Recent work
 
-See [GAPFILLGUI_HDF_UPDATE_SUMMARY.md](GAPFILLGUI_HDF_UPDATE_SUMMARY.md) for the HDF/H5 loading
-support added to `analysis/gapfill_pilatus/gapfillgui.m` (reads `/entry/data/data`, matching the
-pattern already used in `gixsdata.m`).
+See the "HDF5/H5 file support" section of [README.md](README.md) for the HDF/H5 loading support
+in `gixsdata.m` and `analysis/gapfill_pilatus/gapfillgui.m` (reads `/entry/data/data`), and for the
+filter-mismatch error handling (`utilities/hdf5filtermsg.m`) plus the `hdf5_recompress_gui.py`
+workaround for files using non-native HDF5 compression filters.
