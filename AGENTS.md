@@ -38,6 +38,13 @@ background.
 - `demos/` holds runnable example scripts paired with saved `.mat` parameter sets. They hardcode
   the original author's network paths (e.g. `N:\2014-2\...`) — treat as templates to adapt, not
   as scripts to run unmodified.
+- [batch_constrained_linecut.m](batch_constrained_linecut.m) (repo root) is a standalone batch
+  script that drives `gixsdata` directly (no GUI): it builds one template `gixsdata` object from
+  [giwaxs_configure.json](giwaxs_configure.json), `copyhobj`s it per input TIF (mirroring the
+  load pattern in `gixsgui.m`), runs two constrained `linecut` calls (in-plane and out-of-plane
+  azimuthal sectors) per file, and saves each result as a `linecutdata` struct `.mat` file — the
+  same schema as `gixsgui`'s own "Export current linecut to file" (`.mat`) output. See the
+  "Batch constrained linecut export" section of [README.md](README.md) for usage.
 
 ## Conventions
 

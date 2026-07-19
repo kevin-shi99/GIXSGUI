@@ -13,6 +13,36 @@ A short tutorial about GIXSGUI is here: http://gisaxs.com/files/Strzalka.pdf (fr
 
 Comments and questions: gixsgui@anl.gov 
 
+## Batch constrained linecut export
+
+`batch_constrained_linecut.m` (repo root) performs constrained linecuts on a folder of
+GapFilled TIF images without opening the `gixsgui` GUI, and exports each result as a `.mat`
+file. For every input image it produces two linecuts:
+
+- **In-plane**: `0 <= phi <= 10` and `0.25 <= q <= 2.5`
+- **Out-of-plane**: `85 <= phi <= 95` and `0.25 <= q <= 2.5`
+
+### Usage
+
+1. Make sure `gixsgui`'s toolbox path is on MATLAB's path (run `gixsgui` once, or
+   `addpath(genpath('<repo root>'))` manually).
+2. Open and run `batch_constrained_linecut.m` in MATLAB.
+3. A folder-selection dialog prompts for the **input** folder containing `*_GapFilled.tif`
+   files (defaults to the repo root).
+4. A second dialog prompts for the **output** folder to save results into (defaults to the
+   repo root). Either dialog can be cancelled to abort the run.
+5. For each matching TIF, the script writes two files to the output folder:
+   `<name>_linecut_IP.mat` and `<name>_linecut_OOP.mat`, each containing a single struct
+   variable named `linecutdata` with fields `ImFileName`, `XVarName`, `XData`, `YData`,
+   `NOfPixels`, `MapData`, `Constraint` — the same layout produced by `gixsgui`'s own linecut
+   "Export to File" (.mat) button.
+
+Instrument geometry (beam center, SDD, energy, pixel size, incidence angle, specular position)
+is read from [giwaxs_configure.json](giwaxs_configure.json) at the repo root; edit that file (or
+`paramFile` in the script) to point at different instrument parameters. The linecut predictor
+(`X`, default `1` = total q), number of points (`NOfPts`), and the two constraint definitions
+(`constraintIP`/`constraintOOP`) are also configurable at the top of the script.
+
 ## HDF5/H5 file support
 
 Both `gixsgui`'s main image loader (`gixsdata.m`, `loadimage`) and
