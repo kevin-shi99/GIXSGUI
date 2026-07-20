@@ -42,9 +42,11 @@ background.
   script that drives `gixsdata` directly (no GUI): it builds one template `gixsdata` object from
   [giwaxs_configure.json](giwaxs_configure.json), `copyhobj`s it per input TIF (mirroring the
   load pattern in `gixsgui.m`), runs two constrained `linecut` calls (in-plane and out-of-plane
-  azimuthal sectors) per file, and saves each result as a `linecutdata` struct `.mat` file — the
-  same schema as `gixsgui`'s own "Export current linecut to file" (`.mat`) output. See the
-  "Batch constrained linecut export" section of [README.md](README.md) for usage.
+  azimuthal sectors) per file, and saves each result to a `.mat` file containing both a
+  `linecutdata` struct (the same schema as `gixsgui`'s own "Export current linecut to file"
+  (`.mat`) output) and a `linefit_obj` (`linefit` object built from `[XData,YData]`, loadable
+  directly by `linefitgui`). See the "Batch constrained linecut export" section of
+  [README.md](README.md) for usage.
 
 ## Conventions
 

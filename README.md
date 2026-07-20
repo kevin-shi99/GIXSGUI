@@ -30,18 +30,26 @@ file. For every input image it produces two linecuts:
 3. A folder-selection dialog prompts for the **input** folder containing `*_GapFilled.tif`
    files (defaults to the repo root).
 4. A second dialog prompts for the **output** folder to save results into (defaults to the
-   repo root). Either dialog can be cancelled to abort the run.
-5. For each matching TIF, the script writes two files to the output folder:
-   `<name>_linecut_IP.mat` and `<name>_linecut_OOP.mat`, each containing a single struct
-   variable named `linecutdata` with fields `ImFileName`, `XVarName`, `XData`, `YData`,
-   `NOfPixels`, `MapData`, `Constraint` — the same layout produced by `gixsgui`'s own linecut
-   "Export to File" (.mat) button.
+   repo root).
+5. A file-selection dialog prompts for the **calibration `.mat` file** — a `gixsdata` object
+   exported from `gixsgui` via its "Export Parameters" button (Parameters panel), containing
+   the correct beam center, SDD, energy, pixel size, incidence angle and specular position for
+   the data being processed. Any of the three dialogs can be cancelled to abort the run.
+6. For each matching TIF, the script writes two files to the output folder:
+   `<name>_linecut_IP.mat` and `<name>_linecut_OOP.mat`, each containing two variables:
+   - `linecutdata`, a struct with fields `ImFileName`, `XVarName`, `XData`, `YData`,
+     `NOfPixels`, `MapData`, `Constraint` — the same layout produced by `gixsgui`'s own
+     linecut "Export to File" (.mat) button.
+   - `linefit_obj`, a `linefit` object constructed from `[XData,YData]` (same pattern as
+     `gixsgui`'s `linefitgui([XData,YData])` call), which can be loaded directly into
+     `linefitgui` via its "Load..." → "LineFit from file" option.
 
-Instrument geometry (beam center, SDD, energy, pixel size, incidence angle, specular position)
-is read from [giwaxs_configure.json](giwaxs_configure.json) at the repo root; edit that file (or
-`paramFile` in the script) to point at different instrument parameters. The linecut predictor
-(`X`, default `1` = total q), number of points (`NOfPts`), and the two constraint definitions
-(`constraintIP`/`constraintOOP`) are also configurable at the top of the script.
+Instrument geometry is taken entirely from the selected calibration `.mat` file (the script
+errors out if the file doesn't contain a `gixsdata` object), so to use different instrument
+parameters, export a new calibration file from `gixsgui` and select it when prompted. The
+linecut predictor (`X`, default `1` = total q), number of points (`NOfPts`), and the two
+constraint definitions (`constraintIP`/`constraintOOP`) are also configurable at the top of
+the script.
 
 ## HDF5/H5 file support
 
