@@ -98,6 +98,37 @@ Implementation notes:
   script logic.
 - If a file cannot be read or q-maps are unavailable, the script warns and continues.
 
+## Batch reshape image export
+
+`batch_reshape_image.m` (repo root) performs batch image reshaping for GapFilled TIF images,
+without opening the `gixsgui` GUI, and exports a plotted PNG per input file.
+
+### Usage
+
+1. Make sure `gixsgui`'s toolbox path is on MATLAB's path (run `gixsgui` once, or
+   `addpath(genpath('<repo root>'))` manually).
+2. Open and run `batch_reshape_image.m` in MATLAB.
+3. Select the **input** folder containing `*_GapFilled.tif` files.
+4. Select the **output** folder for PNG results.
+5. Select the **calibration `.mat` file** exported from `gixsgui` via "Export Parameters"
+   (must contain one `gixsdata` object with instrument geometry for the dataset).
+6. For each input file, the script writes:
+   `<name>_reshaped.png`
+
+### Default reshape and plot settings
+
+- Reshape axes: `X = 6` (qr), `Y = 3` (qz)
+- Grid size: `XNOfPts = 600`, `YNOfPts = 600`
+- Axis ranges: `XRange = [-2, 0.5]`, `YRange = [0, 2]`
+- Plot scale: `log10` intensity
+- Plot title: `<input_filename>.tif_reshaped` (exact input filename with `_reshaped` suffix)
+
+### Notes
+
+- This script exports **PNG plots only** (no `.mat` reshape data export).
+- If a file cannot be loaded or q-maps are unavailable, the script warns and continues.
+- If any folder/file dialog is cancelled, the script aborts cleanly.
+
 ## Plot linefit result and export peak report
 
 `plot_linefit_result.m` (repo root) loads a saved `.mat` file containing a `linefit` object
