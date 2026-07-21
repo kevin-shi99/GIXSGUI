@@ -51,6 +51,39 @@ linecut predictor (`X`, default `1` = total q), number of points (`NOfPts`), and
 constraint definitions (`constraintIP`/`constraintOOP`) are also configurable at the top of
 the script.
 
+## Plot linefit result and export peak report
+
+`plot_linefit_result.m` (repo root) loads a saved `.mat` file containing a `linefit` object
+(typically variable name `linefit_obj`, exported from `linefitgui`), draws a customized fit
+plot, and exports a peak report CSV.
+
+### Usage
+
+1. Make sure `gixsgui`'s toolbox path is on MATLAB's path (run `gixsgui` once, or
+   `addpath(genpath('<repo root>'))` manually).
+2. Open and run `plot_linefit_result.m` in MATLAB.
+3. In the file dialog, select a `.mat` file containing a fitted `linefit` object.
+4. The script saves outputs to the same folder as the selected MAT file:
+   - `<name>_fit.png`
+   - `<name>_peak_report.csv`
+
+### Plot style and behavior
+
+- Single fit panel only (no residual panel).
+- X-axis label is `q (\AA_{-1})`.
+- Fit-panel title is the selected MAT filename (including `.mat`).
+- Legend uses `Peak 1`, `Peak 2`, ... for component curves.
+
+### CSV content
+
+The CSV contains one row per fitted peak/curve and includes:
+
+- Source/model metadata: `SourceFile`, `ObjectIndex`, `CurveIndex`, `ModelName`,
+  `CurveModelIndex`, `BkgdModelName`, `BkgdModelIndex`
+- Peak metrics: `PeakAmplitude`, `PeakPosition`, `PeakWidth`, `PeakWidthCenter`
+- Background parameter columns: `BkgdParam1`, `BkgdParam2`, ... (depending on the
+  background model)
+
 ## HDF5/H5 file support
 
 Both `gixsgui`'s main image loader (`gixsdata.m`, `loadimage`) and
