@@ -53,6 +53,12 @@ background.
   `x=[-5,-15,-25,-35,-45,-55,-65,-75,-85]`, and exports one `.mat` per sector with suffix
   `_sector_<x>deg`, each containing `linecutdata` and `linefit_obj`. See the "Batch sector
   linecut export" section of [README.md](README.md) for usage.
+- [plot_linecut_azimuth.m](plot_linecut_azimuth.m) (repo root) is an interactive post-processing
+  script for sector linecuts: it prompts for multiple sector `.mat` files (for example from
+  `sector_avg/`), plots all selected azimuthal sectors together (log-scale intensity vs q), and
+  exports PNG/FIG plus a combined CSV table with paired `q`/`intensity` columns per sector and
+  two metadata header rows (symbol row and sector-center-degree row). See the "Plot azimuthal
+  sector linecuts and export combined CSV" section of [README.md](README.md) for usage.
 
 ## Conventions
 

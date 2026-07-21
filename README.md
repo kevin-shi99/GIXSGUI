@@ -13,6 +13,17 @@ A short tutorial about GIXSGUI is here: http://gisaxs.com/files/Strzalka.pdf (fr
 
 Comments and questions: gixsgui@anl.gov 
 
+## HDF4/H5 file support
+
+Both `gixsgui`'s main image loader (`gixsdata.m`, `loadimage`) and
+`analysis/gapfill_pilatus/gapfillgui.m` (`update_edit`) can load `.hdf`/`.h4` files
+directly, alongside TIF/TIFF and CBF. The loader:
+
+- Reads image data from the standard location `/entry/data/data`.
+- If the dataset has multiple frames (a 2D array), sums along the 3rd dimension; a
+  single-frame (1D) dataset is used as-is.
+- Transposes the result for compatibility with the rest of the toolbox.
+
 ## Batch constrained linecut export
 
 `batch_constrained_linecut.m` (repo root) performs constrained linecuts on a folder of
@@ -98,6 +109,50 @@ Implementation notes:
   script logic.
 - If a file cannot be read or q-maps are unavailable, the script warns and continues.
 
+## Plot azimuthal sector linecuts and export combined CSV
+
+`plot_linecut_azimuth.m` (repo root) loads multiple sector linecut `.mat` files (for example,
+from `./sector_avg/` produced by `batch_sector_linecut.m`), plots all selected sectors on one
+log-scale q-intensity figure, and exports plot/data files.
+
+### Usage
+
+1. Make sure `gixsgui`'s toolbox path is on MATLAB's path (run `gixsgui` once, or
+   `addpath(genpath('<repo root>'))` manually).
+2. Open and run `plot_linecut_azimuth.m` in MATLAB.
+3. In the file dialog, select one or more sector `.mat` files to plot together
+   (`MultiSelect` is enabled).
+4. Select an output folder for exports.
+5. The script sorts curves by sector center degree, then exports:
+   - `<base>_sector_azimuth.png`
+   - `<base>_sector_azimuth.fig`
+   - `<base>_sector_azimuth.csv`
+
+`<base>` is auto-derived from the first selected filename by removing the trailing
+`_sector_<x>deg` suffix.
+
+### Input expectations
+
+Each selected MAT file should contain `linecutdata` with fields:
+
+- `XData` (q)
+- `YData` (intensity)
+
+The script reads sector center degree from filename suffix `_sector_<x>deg`. If that parse
+fails, it attempts fallback from `linecutdata.Constraint` (Chi constraint row).
+
+### CSV format
+
+The exported CSV uses paired columns per sector (`Layout B`):
+
+- Column pair per sector: `q_chiX`, `intensity_chiX`
+- **Row 1**: symbols (column names such as `q_chi-15`, `intensity_chi-15`)
+- **Row 2**: sector center degree repeated for both columns in that pair
+- **Row 3+**: numeric q/intensity values
+
+If selected sectors have different linecut lengths, shorter columns are padded with `NaN` so all
+column pairs align in one combined table.
+
 ## Batch reshape image export
 
 `batch_reshape_image.m` (repo root) performs batch image reshaping for GapFilled TIF images,
@@ -154,7 +209,7 @@ plot, and exports a peak report CSV.
 ### Plot style and behavior
 
 - Single fit panel only (no residual panel).
-- X-axis label is `q (\AA_{-1})`.
+- X-axis label is `$$q (\AA_{-1})$$` rendered by `latex` interpreter.
 - Fit-panel title is the selected MAT filename (including `.mat`).
 - Legend uses `Peak 1`, `Peak 2`, ... for component curves.
 
@@ -168,16 +223,6 @@ The CSV contains one row per fitted peak/curve and includes:
 - Background parameter columns: `BkgdParam1`, `BkgdParam2`, ... (depending on the
   background model)
 
-## HDF5/H5 file support
-
-Both `gixsgui`'s main image loader (`gixsdata.m`, `loadimage`) and
-`analysis/gapfill_pilatus/gapfillgui.m` (`update_edit`) can load `.hdf`/`.h5` files
-directly, alongside TIF/TIFF and CBF. The loader:
-
-- Reads image data from the standard location `/entry/data/data`.
-- If the dataset has multiple frames (a 3D array), sums along the 3rd dimension; a
-  single-frame (2D) dataset is used as-is.
-- Transposes the result for compatibility with the rest of the toolbox.
 
 ### Filter/compression errors
 
