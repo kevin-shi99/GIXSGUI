@@ -101,7 +101,8 @@ Implementation notes:
 ## Batch reshape image export
 
 `batch_reshape_image.m` (repo root) performs batch image reshaping for GapFilled TIF images,
-without opening the `gixsgui` GUI, and exports a plotted PNG per input file.
+without opening the `gixsgui` GUI, and exports both a plotted PNG and a MAT
+file containing reshaped numeric results per input file.
 
 ### Usage
 
@@ -109,23 +110,28 @@ without opening the `gixsgui` GUI, and exports a plotted PNG per input file.
    `addpath(genpath('<repo root>'))` manually).
 2. Open and run `batch_reshape_image.m` in MATLAB.
 3. Select the **input** folder containing `*_GapFilled.tif` files.
-4. Select the **output** folder for PNG results.
+4. Select the **output** folder for PNG/MAT results.
 5. Select the **calibration `.mat` file** exported from `gixsgui` via "Export Parameters"
    (must contain one `gixsdata` object with instrument geometry for the dataset).
 6. For each input file, the script writes:
-   `<name>_reshaped.png`
+   - `<name>_reshaped.png`
+   - `<name>_reshaped.mat` (contains one struct variable: `reshapedata`)
 
 ### Default reshape and plot settings
 
 - Reshape axes: `X = 6` (qr), `Y = 3` (qz)
-- Grid size: `XNOfPts = 600`, `YNOfPts = 600`
-- Axis ranges: `XRange = [-2, 0.5]`, `YRange = [0, 2]`
+- Grid size: `XNOfPts = 700`, `YNOfPts = 700`
+- Axis ranges: `XRange = [-2.4, 0.24]`, `YRange = [0, 2.4]`
 - Plot scale: `log10` intensity
+- Plot color limits: `log_plot_Clim = [1.5, 3.8]`
 - Plot title: `<input_filename>.tif_reshaped` (exact input filename with `_reshaped` suffix)
 
 ### Notes
 
-- This script exports **PNG plots only** (no `.mat` reshape data export).
+- The MAT file stores `reshapedata` fields:
+   `ImFileName`, `SourceFilePath`, `XFlag`, `YFlag`, `XVarName`, `YVarName`,
+   `XData`, `YData`, `ImageData`, `CountData`, `DataFlag`, `ReshapeParam`,
+   `LogPlotCLim`.
 - If a file cannot be loaded or q-maps are unavailable, the script warns and continues.
 - If any folder/file dialog is cancelled, the script aborts cleanly.
 

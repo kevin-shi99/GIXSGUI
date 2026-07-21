@@ -1,7 +1,10 @@
 % batch_reshape_image.m
 % ------------------------------------------------------------------
 % Batch script: for every GapFilled .tif file in INPUTDIR, reshape the
-% image using gixsdata.reshape_image and export a plotted PNG to OUTPUTDIR.
+% image using gixsdata.reshape_image and export both:
+%   1) a plotted PNG image
+%   2) a MAT file containing reshaped numeric results and metadata
+% to OUTPUTDIR.
 %
 % Assumes gixsgui's toolbox path is already on MATLAB's path (run
 % gixsgui once, or addpath(genpath('<repo root>')) manually).
@@ -16,7 +19,7 @@ if isequal(inputDir, 0)
     return;
 end
 
-outputDir = uigetdir(repoRoot, 'Select folder to save reshaped PNG images');
+outputDir = uigetdir(repoRoot, 'Select folder to save reshaped PNG/MAT results');
 if isequal(outputDir, 0)
     disp('No output folder selected. Aborting.');
     return;
@@ -37,12 +40,12 @@ DataFlagOverride = [];   % [] = auto-pick (2 if available, else 1)
 % Default reshape parameter for qz vs qr.
 param_reshape.X = 6;          % qr
 param_reshape.Y = 3;          % qz
-param_reshape.XNOfPts = 600;  % number of points on X axis
-param_reshape.YNOfPts = 600;  % number of points on Y axis
-param_reshape.XRange = [-2.4, 0.25];  % range for X axis
+param_reshape.XNOfPts = 700;  % number of points on X axis
+param_reshape.YNOfPts = 700;  % number of points on Y axis
+param_reshape.XRange = [-2.4, 0.24];  % range for X axis
 param_reshape.YRange = [0, 2.4];  % range for Y axis
 
-log_plot_Clim = [1.5, 3.8];  % log10 scale color limits for reshaped image plot
+log_plot_Clim = [2, 3.7];  % log10 scale color limits for reshaped image plot
 
 if ~exist(outputDir, 'dir')
     mkdir(outputDir);
@@ -102,7 +105,26 @@ for ii = 1:numel(flist)
             dataflag = 2;   % SolidAngleCorrectedData
         end
 
-        [x, y, img_reshaped] = reshape_image(gdata, param_reshape, dataflag);
+        [x, y, img_reshaped, countdata] = reshape_image(gdata, param_reshape, dataflag);
+
+        [~, baseName] = fileparts(flist(ii).name);
+
+        reshapedata.ImFileName = gdata.ImFileName;
+        reshapedata.SourceFilePath = imFile;
+        reshapedata.XFlag = param_reshape.X;
+        reshapedata.YFlag = param_reshape.Y;
+        reshapedata.XVarName = axis_label(param_reshape.X);
+        reshapedata.YVarName = axis_label(param_reshape.Y);
+        reshapedata.XData = x;
+        reshapedata.YData = y;
+        reshapedata.ImageData = img_reshaped;
+        reshapedata.CountData = countdata;
+        reshapedata.DataFlag = dataflag;
+        reshapedata.ReshapeParam = param_reshape;
+        reshapedata.LogPlotCLim = log_plot_Clim;
+
+        matName = sprintf('%s_reshaped.mat', baseName);
+        save(fullfile(outputDir, matName), 'reshapedata');
 
         hFig = figure('Visible', 'off', 'Color', 'w');
         plotData = img_reshaped;
@@ -117,7 +139,6 @@ for ii = 1:numel(flist)
         titleStr = sprintf('%s_reshaped', flist(ii).name);
         title(titleStr, 'Interpreter', 'none');
 
-        [~, baseName] = fileparts(flist(ii).name);
         pngName = sprintf('%s_reshaped.png', baseName);
         pngPath = fullfile(outputDir, pngName);
         print(hFig, pngPath, '-dpng', '-r200');
@@ -132,7 +153,7 @@ for ii = 1:numel(flist)
 end
 
 delete(template);
-disp('Batch reshape PNG export complete.');
+disp('Batch reshape PNG + MAT export complete.');
 
 %% ---------------- HELPER ----------------
 function label = axis_label(flag)
