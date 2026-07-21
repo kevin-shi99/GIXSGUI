@@ -47,6 +47,12 @@ background.
   (`.mat`) output) and a `linefit_obj` (`linefit` object built from `[XData,YData]`, loadable
   directly by `linefitgui`). See the "Batch constrained linecut export" section of
   [README.md](README.md) for usage.
+- [batch_sector_linecut.m](batch_sector_linecut.m) (repo root) is a standalone batch script for
+  sector-resolved q linecuts: it iterates all `.tif` files in a selected input folder, applies
+  `0.25<=q<=2.5` plus Chi-window constraints `x-5<=Chi<=x+5` for
+  `x=[-5,-15,-25,-35,-45,-55,-65,-75,-85]`, and exports one `.mat` per sector with suffix
+  `_sector_<x>deg`, each containing `linecutdata` and `linefit_obj`. See the "Batch sector
+  linecut export" section of [README.md](README.md) for usage.
 
 ## Conventions
 
@@ -76,3 +82,6 @@ See the "HDF5/H5 file support" section of [README.md](README.md) for the HDF/H5 
 in `gixsdata.m` and `analysis/gapfill_pilatus/gapfillgui.m` (reads `/entry/data/data`), and for the
 filter-mismatch error handling (`utilities/hdf5filtermsg.m`) plus the `hdf5_recompress_gui.py`
 workaround for files using non-native HDF5 compression filters.
+
+See also the "Batch constrained linecut export" and "Batch sector linecut export" sections of
+[README.md](README.md) for non-GUI batch linecut workflows.

@@ -51,6 +51,53 @@ linecut predictor (`X`, default `1` = total q), number of points (`NOfPts`), and
 constraint definitions (`constraintIP`/`constraintOOP`) are also configurable at the top of
 the script.
 
+## Batch sector linecut export
+
+`batch_sector_linecut.m` (repo root) performs q-axis linecuts in multiple Chi (azimuth)
+sectors for every `.tif` image in a selected input folder, without opening the `gixsgui` GUI.
+
+For each input image, the script applies these constraints per sector:
+
+- **q range**: `0.25 <= q <= 2.5`
+- **Chi range**: `x - 5 <= Chi <= x + 5`
+
+where sector centers are:
+
+- `x = [-5, -15, -25, -35, -45, -55, -65, -75, -85]` (degrees)
+
+This produces **9 exported linecut files per input image**.
+
+### Usage
+
+1. Make sure `gixsgui`'s toolbox path is on MATLAB's path (run `gixsgui` once, or
+   `addpath(genpath('<repo root>'))` manually).
+2. Open and run `batch_sector_linecut.m` in MATLAB.
+3. Select the **input** folder containing `.tif` files.
+4. Select the **output** folder for `.mat` results.
+5. Select the **calibration `.mat` file** exported from `gixsgui` via "Export Parameters"
+   (must contain one `gixsdata` object with the instrument geometry for the dataset).
+6. For each input file and each sector center `x`, the script writes:
+   `<name>_sector_<x>deg.mat`
+
+Examples of output suffixes:
+
+- `_sector_-5deg`
+- `_sector_-15deg`
+- `_sector_-85deg`
+
+Each output `.mat` contains:
+
+- `linecutdata` struct with fields `ImFileName`, `XVarName`, `XData`, `YData`,
+  `NOfPixels`, `MapData`, `Constraint`
+- `linefit_obj` (`linefit` object built from `[XData,YData]`, loadable in `linefitgui`)
+
+Implementation notes:
+
+- Predictor axis is fixed to `X = 1` (q-axis linecut).
+- Data source defaults to `SolidAngleCorrectedData` (`dataflag = 2`) with fallback support in
+  script logic.
+- If a file cannot be read or q-maps are unavailable, the script warns and continues.
+
 ## Plot linefit result and export peak report
 
 `plot_linefit_result.m` (repo root) loads a saved `.mat` file containing a `linefit` object

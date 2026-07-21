@@ -23,7 +23,7 @@ if isequal(outputDir,0)
     return;
 end
 
-filePattern = '*_GapFilled.tif';                    % file selection pattern
+filePattern = '*.tif';                    % file selection pattern
 
 [paramFileName, paramFilePath] = uigetfile(fullfile(repoRoot, '*.mat'), ...
     'Select calibration .mat file (exported from gixsgui via Export Parameters)');
