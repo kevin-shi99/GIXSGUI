@@ -111,15 +111,25 @@ Implementation notes:
 
 ## Plot azimuthal sector linecuts and export combined CSV
 
-`plot_linecut_azimuth.m` (repo root) loads multiple sector linecut `.mat` files (for example,
-from `./sector_avg/` produced by `batch_sector_linecut.m`), plots all selected sectors on one
-log-scale q-intensity figure, and exports plot/data files.
+Azimuth plotting is implemented by three scripts under `workflow/`:
+
+- `plot_linecut_azimuth.m` (manual selection workflow)
+- `plot_linecut_azimuth_auto.m` (automatic grouping workflow)
+- `plot_linecut_azimuth_core.m` (shared load/plot/export engine used by both scripts)
+
+Both user-facing workflows generate the same figure style and CSV layout.
+
+### 1) Manual plotting workflow (`workflow/plot_linecut_azimuth.m`)
+
+This script loads selected sector linecut `.mat` files (for example, files produced by
+`batch_sector_linecut.m`), plots all selected sectors on one log-scale q-intensity figure,
+and exports plot/data files.
 
 ### Usage
 
 1. Make sure `gixsgui`'s toolbox path is on MATLAB's path (run `gixsgui` once, or
    `addpath(genpath('<repo root>'))` manually).
-2. Open and run `plot_linecut_azimuth.m` in MATLAB.
+2. Open and run `workflow/plot_linecut_azimuth.m` in MATLAB.
 3. In the file dialog, select one or more sector `.mat` files to plot together
    (`MultiSelect` is enabled).
 4. Select an output folder for exports.
@@ -130,6 +140,47 @@ log-scale q-intensity figure, and exports plot/data files.
 
 `<base>` is auto-derived from the first selected filename by removing the trailing
 `_sector_<x>deg` suffix.
+
+### 2) Automatic grouping workflow (`workflow/plot_linecut_azimuth_auto.m`)
+
+This script scans a selected folder and groups files by scan token `Pxxxx`, then processes
+each group automatically.
+
+Usage summary:
+
+1. Run `workflow/plot_linecut_azimuth_auto.m`.
+2. Select an input folder containing sector `.mat` files.
+3. Select an output folder.
+4. For each detected `Pxxxx` group, the script plots available sector files and exports:
+    - `<base>_sector_azimuth.png`
+    - `<base>_sector_azimuth.fig`
+    - `<base>_sector_azimuth.csv`
+
+Output naming in auto mode:
+
+- `<base>` is derived from the first filename in each group (after sorting), with trailing
+   `_sector_<x>deg` removed.
+- This keeps dataset-specific naming (for example, sample/condition tokens) rather than using
+   only `Pxxxx`.
+
+Grouping and sector behavior:
+
+- Primary grouping key: scan token `Pxxxx` found in filename.
+- Target sector set: `[-5, -15, -25, -35, -45, -55, -65, -75, -85]` degrees.
+- If some sectors are missing, the script exports using available sectors and reports warnings.
+
+### 3) Shared core function (`workflow/plot_linecut_azimuth_core.m`)
+
+This is an internal shared function used by both workflows. It should normally be called by the
+two scripts above, not run directly as a standalone script.
+
+Responsibilities:
+
+- Load and validate `linecutdata` from input `.mat` files.
+- Parse sector center from filename (`_sector_<x>deg`) with fallback to
+   `linecutdata.Constraint` (Chi row).
+- Sort by sector degree, plot log-scale curves, and export PNG/FIG/CSV.
+- Keep CSV format consistent across manual and auto workflows.
 
 ### Input expectations
 

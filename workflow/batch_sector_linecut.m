@@ -17,7 +17,7 @@ if isequal(inputDir, 0)
     return;
 end
 
-outputDir = uigetdir(repoRoot, 'Select folder to save sector linecut .mat results');
+outputDir = uigetdir(inputDir, 'Select folder to save sector linecut .mat results');
 if isequal(outputDir, 0)
     disp('No output folder selected. Aborting.');
     return;
@@ -37,7 +37,7 @@ X = 1;                  % linecut predictor: 1 = q
 NOfPts = 600;           % number of points in each linecut
 DataFlagOverride = 2;   % [] to auto-pick (2 if available, else 1)
 
-qRange = [0.25, 2.5];   % q range for linecut (in Angstrom^-1)
+qRange = [0.2, 2.5];   % q range for linecut (in Angstrom^-1)
 chiCenters = [-5, -15, -25, -35, -45, -55, -65, -75, -85];  % azimuthal sector centers in degrees
 chiHalfWidth = 5;   % half-width of azimuthal sector in degrees
 

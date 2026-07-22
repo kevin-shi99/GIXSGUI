@@ -38,7 +38,7 @@ background.
 - `demos/` holds runnable example scripts paired with saved `.mat` parameter sets. They hardcode
   the original author's network paths (e.g. `N:\2014-2\...`) — treat as templates to adapt, not
   as scripts to run unmodified.
-- [batch_constrained_linecut.m](batch_constrained_linecut.m) (repo root) is a standalone batch
+- [workflow/batch_constrained_linecut.m](workflow/batch_constrained_linecut.m) is a standalone batch
   script that drives `gixsdata` directly (no GUI): it builds one template `gixsdata` object from
   [giwaxs_configure.json](giwaxs_configure.json), `copyhobj`s it per input TIF (mirroring the
   load pattern in `gixsgui.m`), runs two constrained `linecut` calls (in-plane and out-of-plane
@@ -47,18 +47,22 @@ background.
   (`.mat`) output) and a `linefit_obj` (`linefit` object built from `[XData,YData]`, loadable
   directly by `linefitgui`). See the "Batch constrained linecut export" section of
   [README.md](README.md) for usage.
-- [batch_sector_linecut.m](batch_sector_linecut.m) (repo root) is a standalone batch script for
+- [workflow/batch_sector_linecut.m](workflow/batch_sector_linecut.m) is a standalone batch script for
   sector-resolved q linecuts: it iterates all `.tif` files in a selected input folder, applies
   `0.25<=q<=2.5` plus Chi-window constraints `x-5<=Chi<=x+5` for
   `x=[-5,-15,-25,-35,-45,-55,-65,-75,-85]`, and exports one `.mat` per sector with suffix
   `_sector_<x>deg`, each containing `linecutdata` and `linefit_obj`. See the "Batch sector
   linecut export" section of [README.md](README.md) for usage.
-- [plot_linecut_azimuth.m](plot_linecut_azimuth.m) (repo root) is an interactive post-processing
-  script for sector linecuts: it prompts for multiple sector `.mat` files (for example from
-  `sector_avg/`), plots all selected azimuthal sectors together (log-scale intensity vs q), and
-  exports PNG/FIG plus a combined CSV table with paired `q`/`intensity` columns per sector and
-  two metadata header rows (symbol row and sector-center-degree row). See the "Plot azimuthal
-  sector linecuts and export combined CSV" section of [README.md](README.md) for usage.
+- [workflow/plot_linecut_azimuth.m](workflow/plot_linecut_azimuth.m) is the interactive/manual
+  post-processing script for sector linecuts: it prompts for multiple sector `.mat` files,
+  plots selected azimuthal sectors together (log-scale intensity vs q), and exports PNG/FIG plus
+  a combined CSV table with paired `q`/`intensity` columns per sector and two metadata header
+  rows (symbol row and sector-center-degree row).
+- [workflow/plot_linecut_azimuth_auto.m](workflow/plot_linecut_azimuth_auto.m) is the automatic
+  folder workflow: it groups sector `.mat` files by scan token `Pxxxx` and exports one
+  azimuthal plot set per group.
+- [workflow/plot_linecut_azimuth_core.m](workflow/plot_linecut_azimuth_core.m) is the shared
+  internal load/plot/export function used by both manual and auto scripts.
 
 ## Conventions
 
