@@ -4,6 +4,7 @@
 % image using gixsdata.reshape_image and export both:
 %   1) a plotted PNG image
 %   2) a MAT file containing reshaped numeric results and metadata
+%   3) a MATLAB FIG file for interactive post-adjustment
 % to OUTPUTDIR.
 %
 % Assumes gixsgui's toolbox path is already on MATLAB's path (run
@@ -19,7 +20,7 @@ if isequal(inputDir, 0)
     return;
 end
 
-outputDir = uigetdir(repoRoot, 'Select folder to save reshaped PNG/MAT results');
+outputDir = uigetdir(inputDir, 'Select folder to save reshaped PNG/MAT/FIG results');
 if isequal(outputDir, 0)
     disp('No output folder selected. Aborting.');
     return;
@@ -126,7 +127,7 @@ for ii = 1:numel(flist)
         matName = sprintf('%s_reshaped.mat', baseName);
         save(fullfile(outputDir, matName), 'reshapedata');
 
-        hFig = figure('Visible', 'off', 'Color', 'w');
+        hFig = figure('Visible', 'on', 'Color', 'w');
         plotData = img_reshaped;
         plotData(plotData <= 0) = NaN;
 
@@ -141,7 +142,11 @@ for ii = 1:numel(flist)
 
         pngName = sprintf('%s_reshaped.png', baseName);
         pngPath = fullfile(outputDir, pngName);
-        print(hFig, pngPath, '-dpng', '-r200');
+        exportgraphics(hFig, pngPath, 'Resolution', 600);
+
+        figName = sprintf('%s_reshaped.fig', baseName);
+        figPath = fullfile(outputDir, figName);
+        savefig(hFig, figPath);
     catch ME
         warning('Failed to reshape %s: %s. Skipping.', imFile, ME.message);
     end
@@ -153,7 +158,7 @@ for ii = 1:numel(flist)
 end
 
 delete(template);
-disp('Batch reshape PNG + MAT export complete.');
+disp('Batch reshape PNG + MAT + FIG export complete.');
 
 %% ---------------- HELPER ----------------
 function label = axis_label(flag)

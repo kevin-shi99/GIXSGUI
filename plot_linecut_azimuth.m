@@ -17,7 +17,7 @@ if ischar(fileNames)
     fileNames = {fileNames};
 end
 
-outputDir = uigetdir(repoRoot, 'Select output directory for PNG, FIG, and CSV exports');
+outputDir = uigetdir(fileDir, 'Select output directory for PNG, FIG, and CSV exports');
 if isequal(outputDir, 0)
     disp('No output directory selected. Aborting.');
     return;
@@ -111,9 +111,9 @@ ax.LineWidth = 1.2;
 ax.FontSize = 12;
 ax.FontName = 'Arial';
 set(ax, 'YScale', 'log');
-xlim([0.2 2.0]);
+xlim([0.2 2.5]);
 
-xlabel('$$q \: (\AA^{-1})$$', 'FontSize', 13, 'Interpreter', 'latex');
+xlabel('$$q \: (\mathrm{\AA^{-1}})$$', 'FontSize', 13, 'Interpreter', 'latex');
 ylabel('Intensity (a.u.)', 'FontSize', 13);
 % title(ax, baseName, 'Interpreter', 'none', 'FontSize', 13);
 
