@@ -74,9 +74,9 @@ For each input image, the script applies these constraints per sector:
 
 where sector centers are:
 
-- `x = [-5, -15, -25, -35, -45, -55, -65, -75, -85]` (degrees)
+- `x = [0, -5, -15, -25, -35, -45, -55, -65, -75, -85]` (degrees)
 
-This produces **9 exported linecut files per input image**.
+This produces **10 exported linecut files per input image**.
 
 ### Usage
 
