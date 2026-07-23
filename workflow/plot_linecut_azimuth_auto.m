@@ -23,6 +23,7 @@ if ~exist(outputDir, 'dir')
 end
 
 targetSectors = -5:-10:-85;
+targetSectors = [0, targetSectors];
 
 files = dir(fullfile(inputDir, '*.mat'));
 if isempty(files)

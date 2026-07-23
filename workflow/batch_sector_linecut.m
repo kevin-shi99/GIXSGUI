@@ -38,7 +38,7 @@ NOfPts = 600;           % number of points in each linecut
 DataFlagOverride = 2;   % [] to auto-pick (2 if available, else 1)
 
 qRange = [0.2, 2.5];   % q range for linecut (in Angstrom^-1)
-chiCenters = [-5, -15, -25, -35, -45, -55, -65, -75, -85];  % azimuthal sector centers in degrees
+chiCenters = [0, -5, -15, -25, -35, -45, -55, -65, -75, -85];  % azimuthal sector centers in degrees
 chiHalfWidth = 5;   % half-width of azimuthal sector in degrees
 
 if ~exist(outputDir, 'dir')
