@@ -41,12 +41,12 @@ DataFlagOverride = [];   % [] = auto-pick (2 if available, else 1)
 % Default reshape parameter for qz vs qr.
 param_reshape.X = 6;          % qr
 param_reshape.Y = 3;          % qz
-param_reshape.XNOfPts = 700;  % number of points on X axis
-param_reshape.YNOfPts = 700;  % number of points on Y axis
-param_reshape.XRange = [-2.4, 0.24];  % range for X axis
-param_reshape.YRange = [0, 2.4];  % range for Y axis
+param_reshape.XNOfPts = 600;  % number of points on X axis
+param_reshape.YNOfPts = 600;  % number of points on Y axis
+param_reshape.XRange = [-2.2, 0.24];  % range for X axis
+param_reshape.YRange = [0, 2.2];  % range for Y axis
 
-log_plot_Clim = [2, 3.7];  % log10 scale color limits for reshaped image plot
+log_plot_Clim = [1.5, 3.5];  % log10 scale color limits for reshaped image plot
 
 if ~exist(outputDir, 'dir')
     mkdir(outputDir);

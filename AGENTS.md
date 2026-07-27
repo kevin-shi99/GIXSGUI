@@ -53,6 +53,12 @@ background.
   `x=[-5,-15,-25,-35,-45,-55,-65,-75,-85]`, and exports one `.mat` per sector with suffix
   `_sector_<x>deg`, each containing `linecutdata` and `linefit_obj`. See the "Batch sector
   linecut export" section of [README.md](README.md) for usage.
+- [workflow/batch_chi_linecut.m](workflow/batch_chi_linecut.m) is a standalone batch script for
+  Chi-axis linecuts: it iterates all `.tif` files in a selected input folder, applies the fixed
+  constraint `1.15<=q<=1.5`, performs a `Chi` linecut with `1000` points, and exports one `.mat`
+  plus one two-column `.csv` per input file with suffix `_q<qmin>-<qmax>_I-chi`. The `.mat` contains
+  `linecutdata` and `linefit_obj`; the `.csv` contains `Chi,Intensity`. See the "Batch Chi
+  linecut export" section of [README.md](README.md) for usage.
 - [workflow/plot_linecut_azimuth.m](workflow/plot_linecut_azimuth.m) is the interactive/manual
   post-processing script for sector linecuts: it prompts for multiple sector `.mat` files,
   plots selected azimuthal sectors together (log-scale intensity vs q), and exports PNG/FIG plus
@@ -93,5 +99,6 @@ in `gixsdata.m` and `analysis/gapfill_pilatus/gapfillgui.m` (reads `/entry/data/
 filter-mismatch error handling (`utilities/hdf5filtermsg.m`) plus the `hdf5_recompress_gui.py`
 workaround for files using non-native HDF5 compression filters.
 
-See also the "Batch constrained linecut export" and "Batch sector linecut export" sections of
-[README.md](README.md) for non-GUI batch linecut workflows.
+See also the "Batch constrained linecut export", "Batch sector linecut export", and
+"Batch Chi linecut export" sections of [README.md](README.md) for non-GUI batch linecut
+workflows.

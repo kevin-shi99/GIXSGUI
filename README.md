@@ -109,6 +109,62 @@ Implementation notes:
   script logic.
 - If a file cannot be read or q-maps are unavailable, the script warns and continues.
 
+## Batch Chi linecut export
+
+`workflow/batch_chi_linecut.m` performs one Chi-axis linecut for every `.tif` image in a
+selected input folder, without opening the `gixsgui` GUI.
+
+For each input image, the script applies these fixed settings:
+
+- **Predictor axis**: `Chi` (`X = 9`)
+- **q range**: `1.15 <= q <= 1.5`
+- **Number of points**: `1000`
+
+This produces **two exported files per input image**:
+
+- `<name>_q<qmin>-<qmax>_I-chi.mat`
+- `<name>_q<qmin>-<qmax>_I-chi.csv`
+
+### Usage
+
+1. Make sure `gixsgui`'s toolbox path is on MATLAB's path (run `gixsgui` once, or
+   `addpath(genpath('<repo root>'))` manually).
+2. Open and run `workflow/batch_chi_linecut.m` in MATLAB.
+3. Select the **input** folder containing `.tif` files.
+4. Select the **output** folder for `.mat` and `.csv` results.
+5. Select the **calibration `.mat` file** exported from `gixsgui` via "Export Parameters"
+   (must contain one `gixsdata` object with the instrument geometry for the dataset).
+6. For each input file, the script writes:
+   - `<name>_q<qmin>-<qmax>_I-chi.mat`
+   - `<name>_q<qmin>-<qmax>_I-chi.csv`
+
+For the default constraint `1.15 <= q <= 1.5`, the q-range portion of the filename is written as:
+
+- `_q1p15-1p5_`
+
+Each output `.mat` contains:
+
+- `linecutdata` struct with fields `ImFileName`, `XVarName`, `XData`, `YData`,
+  `NOfPixels`, `MapData`, `Constraint`
+- `linefit_obj` (`linefit` object built from `[XData,YData]`, loadable in `linefitgui`)
+
+Each output `.csv` contains exactly two columns:
+
+- Column 1: `Chi`
+- Column 2: `Intensity`
+
+The first CSV row is the header:
+
+- `Chi,Intensity`
+
+Implementation notes:
+
+- Predictor axis is fixed to `X = 9` (Chi-axis linecut).
+- Constraint is fixed to `1.15 <= q <= 1.5`.
+- Data source defaults to `SolidAngleCorrectedData` (`dataflag = 2`) with fallback support in
+  script logic.
+- If a file cannot be read or q-maps are unavailable, the script warns and continues.
+
 ## Plot azimuthal sector linecuts and export combined CSV
 
 Azimuth plotting is implemented by three scripts under `workflow/`:
