@@ -37,7 +37,7 @@ X = 9;                  % linecut predictor: 9 = chi
 NOfPts = 1000;          % number of points in each linecut
 DataFlagOverride = 2;   % [] to auto-pick (2 if available, else 1)
 
-qRange = [1.56, 1.8];   % q range constraint (in Angstrom^-1)
+qRange = [1.66, 1.7];   % q range constraint (in Angstrom^-1)
 
 if ~exist(outputDir, 'dir')
     mkdir(outputDir);
