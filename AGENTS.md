@@ -38,6 +38,14 @@ background.
 - `demos/` holds runnable example scripts paired with saved `.mat` parameter sets. They hardcode
   the original author's network paths (e.g. `N:\2014-2\...`) — treat as templates to adapt, not
   as scripts to run unmodified.
+- [workflow/batch_gapfill.m](workflow/batch_gapfill.m) batch gap fills up/dn image pairs by driving
+  the `gapfillgui` window (like `mgapfill.m`; uses the GUI's current FF/masks/export type), with the
+  `_up` file as base and the `_dn` file as vertical offset image at `[0 offsetY]` (default `-25`).
+  Pairing lives in [workflow/pair_updn_files.m](workflow/pair_updn_files.m): only the `P<scan>` and
+  `_up`/`_dn` tokens are parsed; dn must be scan+1 and the rest of the filename (incl. extension)
+  must match exactly, so metadata naming may change. Because `gapfillgui`'s loader keeps the old
+  file/data on a failed load, the script verifies the loaded file names after every load. See the
+  "Batch gap fill (up/dn pairs)" section of [README.md](README.md).
 - [workflow/batch_constrained_linecut.m](workflow/batch_constrained_linecut.m) is a standalone batch
   script that drives `gixsdata` directly (no GUI): it builds one template `gixsdata` object from
   [giwaxs_configure.json](giwaxs_configure.json), `copyhobj`s it per input TIF (mirroring the
@@ -59,6 +67,31 @@ background.
   plus one two-column `.csv` per input file with suffix `_q<qmin>-<qmax>_I-chi`. The `.mat` contains
   `linecutdata` and `linefit_obj`; the `.csv` contains `Chi,Intensity`. See the "Batch Chi
   linecut export" section of [README.md](README.md) for usage.
+- [workflow/phi_linecut_pole_figure.m](workflow/phi_linecut_pole_figure.m) is a standalone script
+  for phi-axis pole-figure linecuts on a **single** `.tif` (contrast with the `batch_*` scripts,
+  which iterate a folder with one constraint — this one inverts that: one file, four constraints).
+  It prompts for the `.tif`, an output folder, and a calibration `.mat`, loads the image once, and
+  runs four `phi` linecuts (`X=2`, `500` points, `90<=phi<=180`) at q ranges `0.28-0.4`, `0.5-0.6`,
+  `1.2-1.45`, `1.6-1.85`. It exports `.csv` only (no `.mat`/`linefit_obj`), named
+  `<basename>_phi_90-180_q_<qmin>-<qmax>.csv` with decimal points preserved (matching
+  `pole_figure/*.txt`, unlike `batch_chi_linecut.m`'s `p`-for-dot mangling). Each `.csv` has seven
+  columns: `phi (deg)`, `chi (deg)` (`=phi-90`), `I (a.u.)`, `chi (rad)`, `sin(chi)`,
+  `I(X)*sin(X)` (the sin(chi)-corrected pole figure intensity), and `isotropic`
+  (`I_min*sin(chi)`, where `I_min` is the minimum intensity inside `isoPhiRange`, by default
+  `100<=phi<=170` i.e. `10<=chi<=80`). See the "Phi linecut pole figure export" section of
+  [README.md](README.md) for usage.
+- [workflow/pole_figure_orientation.m](workflow/pole_figure_orientation.m) is the MATLAB
+  counterpart to `giwaxs_pole_figure_analysis.py`: it consumes the 7-column `.csv` files from
+  `phi_linecut_pole_figure.m` (header checked exactly; no 2-column fallback) and computes
+  `<cos^2 chi>`, `S2D` and the Herman's orientation parameter by **numerical integration**
+  (`trapz`) rather than the Python script's equal-bin weighted sum, which is only exact for the
+  18-point 5-degree sector data. Integration limits are not hard-coded: they default to the chi
+  range present in the file, overridable via `chiLimits`, and the effective limits are recorded
+  per file. Input is multi-select. Two parameter sets are reported per file - raw `I`, and the
+  anisotropic part `I - I_min` where `I_min` is recovered from the file's own `isotropic` column.
+  Outputs per file are `<stem>_pole_figure.png`/`.fig`/`_pole_figure_data.csv`, plus one combined
+  `orientation_summary.csv` per run. See the "Pole figure orientation analysis (MATLAB)" section
+  of [README.md](README.md) for usage.
 - [workflow/plot_linecut_azimuth.m](workflow/plot_linecut_azimuth.m) is the interactive/manual
   post-processing script for sector linecuts: it prompts for multiple sector `.mat` files,
   plots selected azimuthal sectors together (log-scale intensity vs q), and exports PNG/FIG plus
@@ -69,6 +102,15 @@ background.
   azimuthal plot set per group.
 - [workflow/plot_linecut_azimuth_core.m](workflow/plot_linecut_azimuth_core.m) is the shared
   internal load/plot/export function used by both manual and auto scripts.
+- [workflow/giwaxs_pole_figure_analysis.py](workflow/giwaxs_pole_figure_analysis.py) is a third
+  standalone, non-integrated Python tool (same convention as `correction_functions.py` and
+  `hdf5_recompress_gui.py`): a CLI that reads two-column azimuthal linecuts (`.txt`, or the
+  `Chi,Intensity` `.csv` from `batch_chi_linecut.m`), applies the `sin(chi)` geometric
+  correction, plots the pole figure, and computes `<cos^2 chi>`, `S2D` and the Herman's
+  orientation parameter (HOP) by a discrete weighted sum over equal-width 5-degree sector bins.
+  Accepts a folder or a single file; needs `numpy` + `matplotlib` (matplotlib is NOT in
+  `env_gixsgui`). See the "GIWAXS pole figure, S2D, and Herman's orientation parameter (HOP)"
+  section of [README.md](README.md).
 
 ## Conventions
 
@@ -99,6 +141,11 @@ in `gixsdata.m` and `analysis/gapfill_pilatus/gapfillgui.m` (reads `/entry/data/
 filter-mismatch error handling (`utilities/hdf5filtermsg.m`) plus the `hdf5_recompress_gui.py`
 workaround for files using non-native HDF5 compression filters.
 
-See also the "Batch constrained linecut export", "Batch sector linecut export", and
-"Batch Chi linecut export" sections of [README.md](README.md) for non-GUI batch linecut
-workflows.
+See also the "Batch constrained linecut export", "Batch sector linecut export",
+"Batch Chi linecut export", and "Phi linecut pole figure export" sections of
+[README.md](README.md) for non-GUI batch linecut workflows.
+
+See the "GIWAXS pole figure, S2D, and Herman's orientation parameter (HOP)" section of
+[README.md](README.md) for the Python post-processing step that consumes those Chi linecuts, and
+the "Pole figure orientation analysis (MATLAB)" section for the MATLAB script that computes the
+same order parameters from the 7-column phi linecut CSVs by numerical integration.
